@@ -2,6 +2,7 @@ from flask_restful import Resource
 from flask_requests import request
 from models import Etiqueta, EtiquetaSchema
 from database import db
+from impl import db_impl
 
 etiquetas_schema = EtiquetaSchema(many=True)
 etiqueta_schema = EtiquetaSchema()
@@ -9,7 +10,7 @@ etiqueta_schema = EtiquetaSchema()
 class EtiquetaAPI(Resource):
     def get(self, id=None):
         if id:
-            tiqueta = Etiqueta.query.get(id)
+            etiqueta = Etiqueta.query.get(id)
             if not etiqueta:
                 return {'etiqueta':'No existe la etiqueta'}, 400
             else:
@@ -26,10 +27,10 @@ class EtiquetaAPI(Resource):
             if not etiqueta:
                 return {'data':'No existe la etiqueta'}, 400
             else:
-                etiqueta.delete()
+                db_impl.delete(etiqueta)
                 return {'status': 'success'}, 204
         else:
-            abort(400)
+            return {'data':'Se espera un id'}, 400
             
     def post(self):
         json_data = request.get_json(force=True)
@@ -38,8 +39,11 @@ class EtiquetaAPI(Resource):
         errors = etiqueta_schema.validate(json_data)
         if errors:
             return {'message': 'Dato incorrecto'}, 500
-        etiqueta = Etiqueta(
-            description=json_data['description']
-        )
-        etiqueta.save()
+        db_impl.save(crear_etiqueta(json_data))
         return {'status': 'success', 'data': json_data}, 201
+
+def crear_etiqueta(data):
+    etiqueta = Etiqueta(
+            description=data['description']
+    )
+    return etiqueta
