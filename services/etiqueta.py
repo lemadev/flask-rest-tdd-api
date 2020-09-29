@@ -1,22 +1,20 @@
-from flask import Blueprint, abort
 from flask_restful import Resource
+from flask_requests import request
 from models import Etiqueta, EtiquetaSchema
 from database import db
 
 etiquetas_schema = EtiquetaSchema(many=True)
 etiqueta_schema = EtiquetaSchema()
 
-etiqueta = Blueprint('etiqueta', __name__, template_folder='routes')
-
-class EtiquetaMethods(Resource):
-    def get(self, id):
+class EtiquetaAPI(Resource):
+    def get(self, id=None):
         if id:
             tiqueta = Etiqueta.query.get(id)
             if not etiqueta:
                 return {'etiqueta':'No existe la etiqueta'}, 400
             else:
                 data = etiqueta_schema.dump(etiqueta)
-                return {'etiqueta':data}, 200
+                return {'etiqueta':data}, 204
         else:
             etiquetas = Etiqueta.query.all()
             etiquetas_lst = etiquetas_schema.dump(etiquetas)
@@ -28,8 +26,7 @@ class EtiquetaMethods(Resource):
             if not etiqueta:
                 return {'data':'No existe la etiqueta'}, 400
             else:
-                db.session.delete(etiqueta)
-                db.session.commit()
+                etiqueta.delete()
                 return {'status': 'success'}, 204
         else:
             abort(400)
@@ -38,13 +35,11 @@ class EtiquetaMethods(Resource):
         json_data = request.get_json(force=True)
         if not json_data:
             return {'message': 'No input data provided'}, 400
-        #data, errors = encuesta_schema.load(json_data)
-        #if errors:
-        #    return {"status": "error", "data": errors}, 422
-        data = etiqueta_schema.load(json_data)
+        errors = etiqueta_schema.validate(json_data)
+        if errors:
+            return {'message': 'Dato incorrecto'}, 500
         etiqueta = Etiqueta(
-            description=data['description']
+            description=json_data['description']
         )
-        db.session.add(etiqueta)
-        db.session.commit()
+        etiqueta.save()
         return {'status': 'success', 'data': json_data}, 201

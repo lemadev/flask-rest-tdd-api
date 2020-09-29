@@ -30,6 +30,15 @@ class Etiqueta(db.Model):
     def __init__(self, description):
         self.description = description
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+    
+
 class EtiquetaSchema(ma.Schema):
     id_etiqueta = fields.Integer(dump_only=True)
     description = fields.String(required=True)

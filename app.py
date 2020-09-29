@@ -1,16 +1,17 @@
 from flask import Flask
 from flask_migrate import Migrate
-from werkzeug.utils import redirect
+from flask_restful import Api
 from database import db
 from services.encuesta import encuesta
 from services.usuario import usuario
-from services.etiqueta import etiqueta
+from services.etiqueta import EtiquetaAPI
+#from services.etiqueta import etiqueta
 
 app = Flask(__name__)
 
-app.register_blueprint(encuesta)
-app.register_blueprint(usuario)
-app.register_blueprint(etiqueta)
+#app.register_blueprint(encuesta)
+#app.register_blueprint(usuario)
+#app.register_blueprint(etiqueta)
 
 #Configuración de la bd
 USER_DB = 'postgres'
@@ -31,6 +32,11 @@ migrate.init_app(app, db)
 
 #configuracion de flask-wtf
 app.config['SECRET_KEY']='key_secret'
+
+
+api = Api(app)
+api.add_resource(EtiquetaAPI, '/etiqueta/', '/etiqueta/<int:id>/')
+
 
 @app.route('/')
 def hello():
