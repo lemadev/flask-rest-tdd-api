@@ -1,7 +1,6 @@
 from models import Encuesta, EncuestaSchema
 from flask_restful import Resource
 from flask_requests import request
-from impl import db_impl
 
 encuestas_schema = EncuestaSchema(many=True)
 encuesta_schema = EncuestaSchema()
@@ -27,7 +26,7 @@ class EncuestaAPI(Resource):
         errors = encuesta_schema.validate(json_data)
         if errors:
             return {'message': 'Datos incorrectos'}, 500
-        db_impl.save(crear_encuesta(json_data))
+        crear_encuesta(json_data).save()
         return {'status': 'success', 'data': json_data}, 201
 
     def delete(self, id):
@@ -35,7 +34,7 @@ class EncuestaAPI(Resource):
         if not encuesta:
             return {'data':'No existe la encuesta'}, 400
         else:
-            db_impl.delete(encuesta)
+            encuesta.delete()
             return {'status': 'success'}, 204
 
 def crear_encuesta(data):

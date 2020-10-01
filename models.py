@@ -1,7 +1,8 @@
-from app import db
 from flask_marshmallow import Marshmallow
 from marshmallow import fields
+from flask_sqlalchemy import SQLAlchemy
 
+db = SQLAlchemy()
 ma = Marshmallow()
 
 class Usuario(db.Model):
@@ -15,6 +16,14 @@ class Usuario(db.Model):
         self.nombre = nombre
         self.apellido = apellido
         self.email = email
+
+    def save(self):
+        db.session.add(instance)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(instance)
+        db.session.commit()
 
 class UsuarioSchema(ma.Schema):
     id_usuario = fields.Integer(dump_only=True)
@@ -30,6 +39,14 @@ class Etiqueta(db.Model):
     def __init__(self, description):
         self.description = description
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
 class EtiquetaSchema(ma.Schema):
     id_etiqueta = fields.Integer(dump_only=True)
     description = fields.String(required=True)
@@ -44,6 +61,14 @@ class Encuesta(db.Model):
     def __init__(self, id_etiqueta, id_usuario):
         self.id_etiqueta = id_etiqueta
         self.id_usuario = id_usuario
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
 class EncuestaSchema(ma.Schema):
     id_encuesta = fields.Integer(dump_only=True)

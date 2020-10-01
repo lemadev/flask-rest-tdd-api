@@ -1,8 +1,6 @@
 from models import Usuario, UsuarioSchema
 from flask_restful import Resource
 from flask_requests import request
-from impl import db_impl
-from database import db
 
 usuarios_schema = UsuarioSchema(many=True)
 usuario_schema = UsuarioSchema()
@@ -28,7 +26,7 @@ class UsuarioAPI(Resource):
         errors = usuario_schema.validate(json_data)
         if errors:
             return {'message': 'Datos incorrectos'}, 500
-        db_impl.save(crear_usuario(json_data))
+        crear_usuario(json_data).save()
         return {'status': 'success', 'data': json_data}, 201
 
     def delete(self, id):
@@ -36,7 +34,7 @@ class UsuarioAPI(Resource):
         if not usuario:
             return {'data':'No existe el usuario'}, 400
         else:
-            db_impl.delete(usuario)
+            usuario.delete()
             return {'status': 'success'}, 204
 
 def crear_usuario(data):

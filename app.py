@@ -1,18 +1,16 @@
 from flask import Flask
 from flask_migrate import Migrate
 from flask_restful import Api
-from database import db
 from services.etiqueta import EtiquetaAPI
 from services.usuario import UsuarioAPI
 from services.encuesta import EncuestaAPI
 from instance.config import app_config
 
+from models import db
+
 def create_app(config_name):
-    #app = Flask(__name__)
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(app_config[config_name])
-    #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost/proyecto_api'
-    #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = Fals
     db.init_app(app)
     migrate = Migrate()
     migrate.init_app(app, db)
